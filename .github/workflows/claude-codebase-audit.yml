@@ -1,9 +1,9 @@
 name: Claude Codebase Audit
 
 on:
-  schedule:
-    - cron: '0 0 * * 1'  # 매주 월요일 00:00 UTC
-  workflow_dispatch:       # 수동 실행도 가능
+  # schedule:
+  #   - cron: '0 0 * * 1'  # 매주 월요일 00:00 UTC (필요 시 주석 해제)
+  workflow_dispatch:       # 수동 실행만 가능
 
 jobs:
   audit:
