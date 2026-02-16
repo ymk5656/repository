@@ -1,0 +1,58 @@
+name: Claude Codebase Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # 매주 월요일 00:00 UTC
+  workflow_dispatch:       # 수동 실행도 가능
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Codebase Audit
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.MY_CLAUDE_API }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            현재 프로젝트 전체 코드베이스를 진단해줘.
+
+            ## 분석 항목
+
+            1. **프로젝트 구조 분석**
+               - 디렉토리 구조와 파일 구성을 파악
+               - CLAUDE.md가 있다면 정의된 규칙을 기준으로 검사
+
+            2. **보안 취약점**
+               - SQL Injection, XSS, CSRF 등 OWASP Top 10
+               - 하드코딩된 시크릿/비밀번호
+               - 안전하지 않은 의존성
+
+            3. **코드 품질**
+               - 중복된 코드 (DRY 원칙 위반)
+               - 가독성이 떨어지는 함수 (너무 길거나 복잡한 함수)
+               - 사용되지 않는 코드 (dead code)
+               - 일관성 없는 네이밍/스타일
+
+            4. **성능**
+               - N+1 쿼리, 불필요한 동기 처리
+               - 메모리 누수 가능성
+               - 최적화 가능한 부분
+
+            5. **리팩토링 제안**
+               - 구체적인 코드 위치와 개선 방안 제시
+               - 우선순위(높음/중간/낮음) 분류
+
+            ## 출력 형식
+            분석 결과를 GitHub Issue로 작성해줘.
+            제목: "[Codebase Audit] YYYY-MM-DD 주간 코드 진단 보고서"
+          use_sticky_comment: false
